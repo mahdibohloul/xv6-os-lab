@@ -126,25 +126,31 @@ panic(char *s)
 //PAGEBREAK: 50
 #define BACKSPACE 0x100
 #define CRTPORT 0x3d4
+#define KEY_UP 0xE2
+#define KEY_LF 0xE4
+#define KEY_RT 0xE5
 static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
-
 static void
 cgaputc(int c)
 {
   int pos;
-
   // Cursor position: col + 80*row.
   outb(CRTPORT, 14);
   pos = inb(CRTPORT+1) << 8;
   outb(CRTPORT, 15);
   pos |= inb(CRTPORT+1);
-
   if(c == '\n')
     pos += 80 - pos%80;
   else if(c == BACKSPACE){
     if(pos > 0) --pos;
-  } else
-    crt[pos++] = (c&0xff) | 0x0700;  // black on white
+  } else if(c == KEY_RT){
+      ++pos;
+  } else if(c == KEY_LF){
+      if (pos > 0) --pos;
+  } else if(c != KEY_UP){
+      crt[pos++] = (c&0xff) | 0x0700;  // black on white
+  }
+
 
   if(pos < 0 || pos > 25*80)
     panic("pos under/overflow");
@@ -159,7 +165,7 @@ cgaputc(int c)
   outb(CRTPORT+1, pos>>8);
   outb(CRTPORT, 15);
   outb(CRTPORT+1, pos);
-  crt[pos] = ' ' | 0x0700;
+  if (c == BACKSPACE) crt[pos] = ' ' | 0x0700;
 }
 
 void
@@ -184,6 +190,11 @@ struct {
   uint r;  // Read index
   uint w;  // Write index
   uint e;  // Edit index
+  uint maxE;
+  uint lastCommand;
+  uint chosenCommand;
+  char commands[10][INPUT_BUF];
+  int sizes[10];
 } input;
 
 #define C(x)  ((x)-'@')  // Control-x
@@ -210,16 +221,54 @@ consoleintr(int (*getc)(void))
     case C('H'): case '\x7f':  // Backspace
       if(input.e != input.w){
         input.e--;
+        if (input.maxE == input.e + 1) input.maxE--;
         consputc(BACKSPACE);
       }
       break;
+    case KEY_LF:
+        if(input.e != input.w){
+            input.e--;
+            consputc(KEY_LF);
+        }
+        break;
+    case KEY_RT:
+        if(input.e < input.maxE){
+            input.e++;
+            consputc(KEY_RT);
+        }
+        break;
+    case KEY_UP:
+        while(input.e != input.w &&
+              input.buf[(input.e-1) % INPUT_BUF] != '\n'){
+            input.e--;
+            consputc(BACKSPACE);
+        }
+        input.e = input.r;
+        for (int i = 0; i < input.sizes[input.chosenCommand] - 1; i++) {
+            input.buf[input.e++ % INPUT_BUF] = input.commands[input.chosenCommand][i];
+            consputc(input.commands[input.chosenCommand][i]);
+        }
+        input.maxE = input.e;
+        if (input.chosenCommand == 0) input.chosenCommand = 10;
+        if(input.sizes[input.chosenCommand - 1] <= 0) input.chosenCommand = input.lastCommand;
+        else input.chosenCommand = input.chosenCommand - 1;
+        break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
         input.buf[input.e++ % INPUT_BUF] = c;
+        if (input.maxE == input.e - 1) input.maxE++;
         consputc(c);
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
-          input.w = input.e;
+          input.w = input.maxE;
+            if (input.maxE - input.r > 1){
+                for (int i = 0; i < input.maxE - input.r; i++) {
+                    input.commands[input.lastCommand + 1 % 10][i] = input.buf[(input.r + i) % INPUT_BUF];
+                }
+                input.lastCommand = (input.lastCommand + 1) % 10;
+                input.sizes[input.lastCommand] = input.maxE - input.r;
+                input.chosenCommand = input.lastCommand;
+            }
           wakeup(&input.r);
         }
       }
