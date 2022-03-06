@@ -220,9 +220,24 @@ consoleintr(int (*getc)(void))
       break;
     case C('H'): case '\x7f':  // Backspace
       if(input.e != input.w){
-        input.e--;
-        if (input.maxE == input.e + 1) input.maxE--;
-        consputc(BACKSPACE);
+          for (int i = 0; i < input.maxE - input.e; i++) {
+              consputc(KEY_RT);
+          }
+          for (int i = 0; i < input.maxE - input.e; i++) {
+              input.buf[input.e + i - 1] = input.buf[input.e + i];
+          }
+          for (int i = 0; i < input.maxE - input.e; i++) {
+              consputc(BACKSPACE);
+          }
+          input.e--;
+          input.maxE--;
+          consputc(BACKSPACE);
+          for (int i = 0; i < input.maxE - input.e; i++) {
+              consputc(input.buf[input.e + i]);
+          }
+          for (int i = 0; i < input.maxE - input.e; i++) {
+              consputc(KEY_LF);
+          }
       }
       break;
     case KEY_LF:
@@ -238,6 +253,10 @@ consoleintr(int (*getc)(void))
         }
         break;
     case KEY_UP:
+        for (int i = 0; i < input.maxE - input.e; i++) {
+            consputc(' ');
+        }
+        input.e = input.maxE;
         while(input.e != input.w &&
               input.buf[(input.e-1) % INPUT_BUF] != '\n'){
             input.e--;
@@ -254,20 +273,38 @@ consoleintr(int (*getc)(void))
         else input.chosenCommand = input.chosenCommand - 1;
         break;
     default:
-      if(c != 0 && input.e-input.r < INPUT_BUF){
+      if(c != 0 && input.maxE-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
-        input.buf[input.e++ % INPUT_BUF] = c;
-        if (input.maxE == input.e - 1) input.maxE++;
-        consputc(c);
-        if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
+        if (c == '\n'){
+            input.buf[input.maxE++ % INPUT_BUF] = c;
+            consputc(c);
+        }else{
+            consputc(c);
+            char temp1 = input.buf[input.e], temp2;
+            int size = input.maxE - input.e;
+            input.buf[input.e++ % INPUT_BUF] = c;
+            for (int i = 0; i < size; i++) {
+                consputc(temp1);
+                temp2 = input.buf[(input.e + i) % INPUT_BUF];
+                input.buf[(input.e + i) % INPUT_BUF] = temp1;
+                temp1 = temp2;
+            }
+            input.maxE++;
+            for (int i = 0; i < size; i++) {
+                consputc(KEY_LF);
+            }
+        }
+
+        if(c == '\n' || c == C('D') || input.maxE == input.r+INPUT_BUF){
           input.w = input.maxE;
+          input.e = input.maxE;
             if (input.maxE - input.r > 1){
                 for (int i = 0; i < input.maxE - input.r; i++) {
-                    input.commands[input.lastCommand + 1 % 10][i] = input.buf[(input.r + i) % INPUT_BUF];
+                    input.commands[input.lastCommand % 10][i] = input.buf[(input.r + i) % INPUT_BUF];
                 }
-                input.lastCommand = (input.lastCommand + 1) % 10;
                 input.sizes[input.lastCommand] = input.maxE - input.r;
                 input.chosenCommand = input.lastCommand;
+                input.lastCommand = (input.lastCommand + 1) % 10;
             }
           wakeup(&input.r);
         }
