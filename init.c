@@ -7,6 +7,10 @@
 
 char *argv[] = { "sh", 0 };
 
+void print_group_members() {
+  printf(1, "Group #10 Members: \n1. Mahdi Bohloul\n2. Amir Farahani\n 3. Arash Mohamadpour\n");
+}
+
 int
 main(void)
 {
@@ -21,6 +25,7 @@ main(void)
 
   for(;;){
     printf(1, "init: starting sh\n");
+    print_group_members();
     pid = fork();
     if(pid < 0){
       printf(1, "init: fork failed\n");
