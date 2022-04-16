@@ -30,7 +30,7 @@ OBJS = \
 
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
- TOOLPREFIX = x86_64-elf-
+#  TOOLPREFIX = x86_64-elf-
 
 # Using native tools (e.g., on X86 Linux)
 #TOOLPREFIX = 
@@ -185,6 +185,7 @@ UPROGS=\
 	_sort_string\
 	_get_next_prime_number\
 	_get_call_count\
+	_get_most_caller\
 	_wait_for_process\
 
 fs.img: mkfs README $(UPROGS)
