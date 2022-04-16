@@ -82,6 +82,12 @@ argstr(int n, char **pp)
   return fetchstr(addr, pp);
 }
 
+void
+add_to_counter(int syscall_num) {
+  struct proc *curproc = myproc();
+  curproc -> syscall_count[syscall_num-1]++;
+}
+
 extern int sys_chdir(void);
 extern int sys_close(void);
 extern int sys_dup(void);
@@ -104,6 +110,7 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_get_next_prime_number(void);
+extern int sys_get_call_count(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -128,6 +135,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_get_next_prime_number] sys_get_next_prime_number,
+[SYS_get_call_count] sys_get_call_count,
 };
 
 void
@@ -138,6 +146,7 @@ syscall(void)
 
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    add_to_counter(num);
     curproc->tf->eax = syscalls[num]();
   } else {
     cprintf("%d %s: unknown sys call %d\n",
