@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_get_next_prime_number 22
 #define SYS_get_call_count 23
+#define SYS_wait_for_process 24

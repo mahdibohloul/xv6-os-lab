@@ -185,6 +185,7 @@ UPROGS=\
 	_sort_string\
 	_get_next_prime_number\
 	_get_call_count\
+	_wait_for_process\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
