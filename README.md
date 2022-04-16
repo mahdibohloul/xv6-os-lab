@@ -1,2 +1,2 @@
 
-# OSLab - CA0
+# Operating System Lab 1
