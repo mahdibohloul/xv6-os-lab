@@ -125,3 +125,16 @@ sys_get_call_count(void)
   struct proc *curproc = myproc();
   return curproc -> syscall_count[number-1];
 }
+
+int
+sys_wait_for_process(void)
+{
+  int child_pid;
+  if (argint(0, &child_pid) < 0) {
+    return -1;
+  }
+  struct proc* curproc = myproc();
+  curproc -> pid = child_pid;
+  wait();
+  return 0;
+}
