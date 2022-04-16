@@ -97,6 +97,9 @@ sys_get_next_prime_number(void)
   if (argint(0, &prime) < 0) {
     return -1;
   }
+  if(prime == 1) {
+    return 2;
+  }
   int found = 0;
   while(!found) {
     prime = prime + 1;
