@@ -184,6 +184,7 @@ UPROGS=\
 	_zombie\
 	_sort_string\
 	_get_next_prime_number\
+	_get_call_count\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

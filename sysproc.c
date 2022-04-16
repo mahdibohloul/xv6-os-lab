@@ -114,3 +114,14 @@ sys_get_next_prime_number(void)
   }
   return -1;
 }
+
+int
+sys_get_call_count(void)
+{
+  int number;
+  if (argint(0, &number) < 0) {
+    return -1;
+  }
+  struct proc *curproc = myproc();
+  return curproc -> syscall_count[number-1];
+}
