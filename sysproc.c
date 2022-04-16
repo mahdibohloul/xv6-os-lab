@@ -127,6 +127,21 @@ sys_get_call_count(void)
 }
 
 int
+sys_get_most_caller(void)
+{
+  int most_called = 0;
+  int syscall = 0;
+  struct proc *curproc = myproc();
+  for (int i=0 ; i < 100 ; i++) {
+    if(curproc->syscall_count[i] > most_called) {
+      most_called = curproc->syscall_count[i];
+      syscall = i;
+    }
+  }
+  return (syscall+1);  
+}
+
+int
 sys_wait_for_process(void)
 {
   int child_pid;
