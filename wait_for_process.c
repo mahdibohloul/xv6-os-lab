@@ -4,8 +4,21 @@
 
 int main(int argc, char *argv[]) 
 {
-    int pid = atoi(argv[1]);
-    printf(1, "We're waiting for process with pid number %d\n", pid);
-    wait_for_process(pid);
-    exit();
+    int pid1 = fork();
+    if(pid1 == 0) {
+        for(int i=0; i<10000000; i++){};
+        printf(1, "First run me!\n");
+        exit();
+    } else {
+        int pid2 = fork();
+        if (pid2 == 0) {
+            wait_for_process(pid1);
+            printf(1, "Then run me\n");
+            exit();
+        } else {
+            wait();
+            printf(1, "At last run me!\n");
+            exit();
+        }
+    }   
 } 
