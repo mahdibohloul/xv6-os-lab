@@ -140,12 +140,9 @@ sys_get_most_caller(void)
 int
 sys_wait_for_process(void)
 {
-  int child_pid;
-  if (argint(0, &child_pid) < 0) {
+  int pid;
+  if (argint(0, &pid) < 0) {
     return -1;
   }
-  struct proc* curproc = myproc();
-  curproc -> pid = child_pid;
-  wait();
-  return 0;
+  return wait_for_process(pid);
 }

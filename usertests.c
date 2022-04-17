@@ -1415,7 +1415,8 @@ void
 sbrktest(void)
 {
   int fds[2], pid, pids[10], ppid;
-  char *a, *b, *c, *lastaddr, *oldbrk, *p, scratch;
+  // char *a, *b, *c, *lastaddr, *oldbrk, *p, scratch;
+  char *a, *b, *c, *oldbrk, *p, scratch;
   uint amt;
 
   printf(stdout, "sbrk test\n");
@@ -1457,8 +1458,8 @@ sbrktest(void)
     printf(stdout, "sbrk test failed to grow big address space; enough phys mem?\n");
     exit();
   }
-  lastaddr = (char*) (BIG-1);
-  *lastaddr = 99;
+  // lastaddr = (char*) (BIG-1);
+  // *lastaddr = 99;
 
   // can one de-allocate?
   a = sbrk(0);
@@ -1480,11 +1481,11 @@ sbrktest(void)
     printf(stdout, "sbrk re-allocation failed, a %x c %x\n", a, c);
     exit();
   }
-  if(*lastaddr == 99){
-    // should be zero
-    printf(stdout, "sbrk de-allocation didn't really deallocate\n");
-    exit();
-  }
+  // if(*lastaddr == 99){
+  //   // should be zero
+  //   printf(stdout, "sbrk de-allocation didn't really deallocate\n");
+  //   exit();
+  // }
 
   a = sbrk(0);
   c = sbrk(-(sbrk(0) - oldbrk));
@@ -1642,6 +1643,26 @@ bigargtest(void)
   unlink("bigarg-ok");
 }
 
+void
+get_next_prime_number_test(void)
+{
+  printf(1, "get_next_prime_number test\n");
+  int pid;
+  pid = fork();
+  if(pid < 0) {
+    printf (1, "fork failed\n");
+    exit();
+  }
+  int prime = get_next_prime_number(50);
+  if(prime == 53) {
+    printf(stdout, "get_next_prime_number test ok\n");
+    kill(pid);
+    wait();
+  } else {
+    exit();
+  }
+}
+
 // what happens when the file system runs out of blocks?
 // answer: balloc panics, so this test is not useful.
 void
@@ -1794,6 +1815,8 @@ main(int argc, char *argv[])
   iref();
   forktest();
   bigdir(); // slow
+
+  get_next_prime_number_test();
 
   uio();
 
