@@ -23,7 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int get_next_prime_number(int);
+int get_next_prime_number(void);
 int get_call_count(int);
 int get_most_caller(int);
 int wait_for_process(int);

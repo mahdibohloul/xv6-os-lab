@@ -122,6 +122,7 @@ void            wakeup(void*);
 void            yield(void);
 int             get_most_caller(int);
 int             wait_for_process(int);
+int             get_next_prime_number(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

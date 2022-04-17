@@ -93,26 +93,8 @@ sys_uptime(void)
 int
 sys_get_next_prime_number(void)
 {
-  int prime;
-  if (argint(0, &prime) < 0) {
-    return -1;
-  }
-  if(prime == 1) {
-    return 2;
-  }
-  int found = 0;
-  while(!found) {
-    prime = prime + 1;
-    for (int i=2 ; i<prime ; i++) {
-      if (prime%i == 0) {
-        break;
-      }
-      else if (i == prime - 1) {
-        return prime;
-      }
-    }
-  }
-  return -1;
+    int number = myproc()->tf->ebx;
+    return get_next_prime_number(number);
 }
 
 int
