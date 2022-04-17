@@ -1791,30 +1791,30 @@ main(int argc, char *argv[])
   sbrktest();
   validatetest();
 
-  // opentest();
-  // writetest();
-  // writetest1();
-  // createtest();
+  opentest();
+  writetest();
+  writetest1();
+  createtest();
 
-  // openiputtest();
-  // exitiputtest();
-  // iputtest();
+  openiputtest();
+  exitiputtest();
+  iputtest();
 
-  // mem();
-  // pipe1();
-  // preempt();
-  // exitwait();
+  mem();
+  pipe1();
+  preempt();
+  exitwait();
 
-  // rmdot();
-  // fourteen();
-  // bigfile();
-  // subdir();
-  // linktest();
-  // unlinkread();
-  // dirfile();
-  // iref();
+  rmdot();
+  fourteen();
+  bigfile();
+  subdir();
+  linktest();
+  unlinkread();
+  dirfile();
+  iref();
   forktest();
-  // bigdir(); // slow
+  bigdir(); // slow
 
   get_next_prime_number_test();
 
