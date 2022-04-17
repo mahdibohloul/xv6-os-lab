@@ -188,6 +188,7 @@ UPROGS=\
 	_get_most_caller\
 	_wait_for_process\
 	_callcounttest\
+	_most_caller_test\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
