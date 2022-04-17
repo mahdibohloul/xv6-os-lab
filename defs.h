@@ -120,6 +120,7 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             get_most_caller(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -155,6 +156,7 @@ int             argstr(int, char**);
 int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
 void            add_to_counter(int); 
+int             get_count_syscall(int*, int);
 void            syscall(void);
 
 // timer.c

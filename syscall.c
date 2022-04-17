@@ -83,9 +83,16 @@ argstr(int n, char **pp)
 }
 
 void
-add_to_counter(int syscall_num) {
+add_to_counter(int syscall_num)
+{
   struct proc *curproc = myproc();
   curproc -> syscall_count[syscall_num-1]++;
+}
+
+int
+get_count_syscall(int* syscall_counter, int syscall_number)
+{
+  return syscall_counter[syscall_number-1];
 }
 
 extern int sys_chdir(void);

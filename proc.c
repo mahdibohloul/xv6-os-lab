@@ -532,3 +532,23 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int
+get_most_caller(int sys_num)
+{
+  struct proc *p;
+  
+  int max = 0;
+  int most_pid = 0;
+  int value = 0;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    value = get_count_syscall(p -> syscall_count, sys_num);
+    if (value > max) {
+      most_pid = p -> pid;
+    }
+  }
+  release(&ptable.lock);
+  return most_pid;
+}

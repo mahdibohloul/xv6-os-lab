@@ -4,7 +4,8 @@
 
 int main(int argc, char *argv[]) 
 {
-    int most_caller = get_most_caller();
-    printf(1, "The most called system call number is %d\n", most_caller);
+    int sys_num = atoi(argv[1]);
+    int most_pid_caller = get_most_caller(sys_num);
+    printf(1, "The process who has called the syscall number %d has pid %d\n", sys_num, most_pid_caller);
     exit();
 } 
