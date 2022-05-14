@@ -33,6 +33,7 @@ struct context {
 };
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+enum queuelevel {ROUND_ROBIN_LVL, FCFS_LVL, BJF_LVL};
 
 // Per-process state
 struct proc {
@@ -50,6 +51,10 @@ struct proc {
   struct inode *cwd;           // Current directory
   int syscall_count[100];      //syscall count 
   char name[16];               // Process name (debugging)
+  enum queuelevel queue_lvl;   // Queue Level (default 2)
+  int exec_cycle;
+  int waiting_in_queue_cycle;
+  int last_cpu_time;
 };
 
 // Process memory is laid out contiguously, low addresses first:
