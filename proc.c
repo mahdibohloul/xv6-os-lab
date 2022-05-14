@@ -599,3 +599,24 @@ int get_next_prime_number(int n) {
     }
     return -1;
 }
+
+struct proc* 
+round_robin_sched(void) 
+{
+    struct proc* first = 0;
+
+    int now = ticks;
+    int max_process_time = -1e5;
+
+    for (struct proc* p = ptable.proc ; p < &ptable.proc[NPROC] ; p++) {
+        if (p -> state != RUNNABLE || p -> queue_lvl != ROUND_ROBIN_LVL) {
+            continue;
+        }
+
+        if (now - p -> last_cpu_time > max_process_time) {
+            max_process_time = now - p -> last_cpu_time;
+            first = p;
+        }
+    }
+    return first;
+}
