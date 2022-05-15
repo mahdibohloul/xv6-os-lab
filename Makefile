@@ -185,13 +185,15 @@ UPROGS=\
 	_sort_string\
 	_get_next_prime_number\
 	_get_call_count\
-	_get_most_caller\
 	_wait_for_process\
-	_call_count_test\
-	_most_caller_test\
 	_foo\
 	_ps\
+	_sb\
+	_sbp\
 	_qc\
+	# _get_most_caller\
+	# _call_count_test\
+	# _most_caller_test\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
