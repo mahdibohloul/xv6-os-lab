@@ -127,12 +127,10 @@ int             get_next_prime_number(int);
 void            age(void);
 float           get_rank(struct proc* p);
 struct proc*    round_robin_sched(void);
-<<<<<<< HEAD
 void            printp(void);
-=======
+
 struct proc*    fcfs_sched(void);
 struct proc*    bjf_sched(void);
->>>>>>> 0b476905a6a20ed4ff606e7a5a69fdff7aaf4fb1
 
 // swtch.S
 void            swtch(struct context**, struct context*);
