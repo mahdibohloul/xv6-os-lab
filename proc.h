@@ -52,10 +52,19 @@ struct proc {
   int syscall_count[100];      //syscall count 
   char name[16];               // Process name (debugging)
   enum queuelevel queue_lvl;   // Queue Level (default 2)
+  int priority;
+  int priority_ratio;
+  int arrival;
+  int arrival_ratio;
   int exec_cycle;
+  int exec_cycle_ratio;
   int waiting_in_queue_cycle;
   int last_cpu_time;
+<<<<<<< HEAD
   int arrival_time;
+=======
+  uint creation_time;
+>>>>>>> 0b476905a6a20ed4ff606e7a5a69fdff7aaf4fb1
 };
 
 // Process memory is laid out contiguously, low addresses first:
