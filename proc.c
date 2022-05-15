@@ -316,37 +316,73 @@ wait(void) {
 //      via swtch back to the scheduler.
 void
 scheduler(void) {
-    struct proc *p;
-    struct cpu *c = mycpu();
-    c->proc = 0;
+    // struct proc *p;
+    // struct cpu *c = mycpu();
+    // c->proc = 0;
 
-    for (;;) {
-        // Enable interrupts on this processor.
-        sti();
+    // for (;;) {
+    //     // Enable interrupts on this processor.
+    //     sti();
 
-        // Loop over process table looking for process to run.
-        acquire(&ptable.lock);
-        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            if (p->state != RUNNABLE)
-                continue;
+    //     // Loop over process table looking for process to run.
+    //     acquire(&ptable.lock);
+    //     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    //         if (p->state != RUNNABLE)
+    //             continue;
 
-            // Switch to chosen process.  It is the process's job
-            // to release ptable.lock and then reacquire it
-            // before jumping back to us.
-            c->proc = p;
-            switchuvm(p);
-            p->state = RUNNING;
+    //         // Switch to chosen process.  It is the process's job
+    //         // to release ptable.lock and then reacquire it
+    //         // before jumping back to us.
+    //         c->proc = p;
+    //         switchuvm(p);
+    //         p->state = RUNNING;
 
-            swtch(&(c->scheduler), p->context);
-            switchkvm();
+    //         swtch(&(c->scheduler), p->context);
+    //         switchkvm();
 
-            // Process is done running for now.
-            // It should have changed its p->state before coming back.
-            c->proc = 0;
-        }
-        release(&ptable.lock);
+    //         // Process is done running for now.
+    //         // It should have changed its p->state before coming back.
+    //         c->proc = 0;
+    //     }
+    //     release(&ptable.lock);
 
+    // }
+
+  struct proc *p = 0;
+  struct cpu *c = mycpu();
+  c->proc = 0;
+  
+  for(;;){
+    // Enable interrupts on this processor.
+    sti();
+
+    // Loop over process table looking for process to run.
+    acquire(&ptable.lock);
+
+    p = round_robin_sched();
+
+    if (p == 0)
+      p = fcfs_sched();
+
+    if(p == 0)
+      p = bjf_sched();
+    
+    if (p == 0) {
+      release(&ptable.lock);
+      continue;
     }
+    age();
+    c->proc = p;
+    switchuvm(p);
+    p->state = RUNNING;
+
+    swtch(&(c->scheduler), p->context);
+    switchkvm();
+
+    c->proc = 0;
+    release(&ptable.lock);
+
+  }
 }
 
 // Enter scheduler.  Must hold only ptable.lock
@@ -600,10 +636,41 @@ int get_next_prime_number(int n) {
     return -1;
 }
 
+void
+age(void)
+{
+  struct proc* p = 0;
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+    if (p->state != RUNNABLE)
+      continue;
+
+    if (p->waiting_in_queue_cycle > 8000) {
+        if (p->queue_lvl == FCFS_LVL) {
+            p->queue_lvl = ROUND_ROBIN_LVL;
+        }
+        if (p->queue_lvl == BJF_LVL) {
+            p->queue_lvl = FCFS_LVL;
+        }
+    }
+    p->waiting_in_queue_cycle = 0;
+  }
+}
+
+float
+get_rank(struct proc* p)
+{
+  return 
+    1.0 / (float)p->priority * p->priority_ratio
+    + p->arrival * p->arrival_ratio
+    + p->exec_cycle * p->exec_cycle_ratio
+    + 1;
+}
+
 struct proc* 
 round_robin_sched(void) 
 {
-    struct proc* first = 0;
+    struct proc* chosen_proc = 0;
 
     int now = ticks;
     int max_process_time = -1e5;
@@ -615,8 +682,50 @@ round_robin_sched(void)
 
         if (now - p -> last_cpu_time > max_process_time) {
             max_process_time = now - p -> last_cpu_time;
-            first = p;
+            chosen_proc = p;
         }
     }
-    return first;
+    return chosen_proc;
+}
+
+struct proc*
+fcfs_sched(void)
+{
+    struct proc* chosen_proc = 0;
+    
+    int mn = 2e9;
+    for (struct proc* p = ptable.proc ; p < &ptable.proc[NPROC] ; p++) {
+        p -> waiting_in_queue_cycle++;
+        if (p -> state != RUNNABLE || p -> queue_lvl != FCFS_LVL) {
+            continue;
+        }
+
+        if (p->creation_time < mn)
+        {
+            mn = p->creation_time;
+            chosen_proc = p;
+        }
+    }
+    return chosen_proc;
+}
+
+struct proc*
+bjf_sched(void)
+{
+  struct proc* chosen_proc = 0;
+  int min_rank = -1, rank= -1;
+
+
+  for(struct proc* p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+    if (p->state != RUNNABLE || p->queue_lvl != BJF_LVL)
+      continue;
+
+    rank = get_rank(p);
+    if (rank < min_rank || min_rank == -1) {
+      chosen_proc = p;
+      min_rank = rank;
+    }
+  }
+
+  return chosen_proc;
 }

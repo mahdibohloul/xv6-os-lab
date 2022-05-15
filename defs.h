@@ -123,7 +123,11 @@ void            yield(void);
 int             get_most_caller(int);
 int             wait_for_process(int);
 int             get_next_prime_number(int);
+void            age(void);
+float           get_rank(struct proc* p);
 struct proc*    round_robin_sched(void);
+struct proc*    fcfs_sched(void);
+struct proc*    bjf_sched(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
