@@ -87,6 +87,7 @@ allocproc(void) {
     found:
     p->state = EMBRYO;
     p->pid = nextpid++;
+    p->arrival_time = ticks;
 
     release(&ptable.lock);
 
@@ -304,6 +305,34 @@ wait(void) {
         // Wait for children to exit.  (See wakeup1 call in proc_exit.)
         sleep(curproc, &ptable.lock);  //DOC: wait-sleep
     }
+}
+void
+printp(void){
+  cprintf("name   pid   status   queue   init time   effectiveness   rank   cpu cycles\n");
+  struct proc* p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+  	if (p->pid == 0)
+                continue;
+       cprintf("%s  ", p -> name);
+       cprintf("%d  ", p -> pid);
+       if(p -> state == SLEEPING)
+          cprintf("SLEEPING  ");
+       else if(p -> state == RUNNABLE)
+          cprintf("RUNNABLE  ");
+       else if(p -> state == UNUSED)
+          cprintf("UNUSED  ");
+       else if(p -> state == EMBRYO)
+          cprintf("EMBRYO  ");
+       else if(p -> state == RUNNING)
+          cprintf("RUNNING  ");
+       else if(p -> state == ZOMBIE)
+          cprintf("ZOMBIE  ");
+       cprintf("%d  ", p -> queue_lvl);
+       cprintf("%d  ", p -> arrival_time);
+       cprintf("%d  ", 0);
+       cprintf("%d  ", 0);
+       cprintf("%d  \n", 0);
+   }
 }
 
 //PAGEBREAK: 42

@@ -120,6 +120,7 @@ extern int sys_get_next_prime_number(void);
 extern int sys_get_call_count(void);
 extern int sys_get_most_caller(void);
 extern int sys_wait_for_process(void);
+extern int sys_print_processes(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -147,6 +148,7 @@ static int (*syscalls[])(void) = {
 [SYS_get_call_count] sys_get_call_count,
 [SYS_get_most_caller] sys_get_most_caller,
 [SYS_wait_for_process] sys_wait_for_process,
+[SYS_print_processes] sys_print_processes,
 };
 
 void

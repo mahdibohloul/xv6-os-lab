@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[]) 
 {
+    print_processes();
     //SYS_fork
     printf(1, "The process who has called the FORK syscall the most has pid %d\n", get_most_caller(SYS_fork));
     //SYS_write

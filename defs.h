@@ -121,9 +121,11 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 int             get_most_caller(int);
+int             print_processes(void);
 int             wait_for_process(int);
 int             get_next_prime_number(int);
 struct proc*    round_robin_sched(void);
+void            printp(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

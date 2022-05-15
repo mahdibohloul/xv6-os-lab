@@ -128,3 +128,9 @@ sys_wait_for_process(void)
   }
   return wait_for_process(pid);
 }
+
+int
+sys_print_processes(void){
+  printp();
+  return 0;
+}

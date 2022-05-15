@@ -24,3 +24,4 @@
 #define SYS_get_call_count 23
 #define SYS_get_most_caller 24
 #define SYS_wait_for_process 25
+#define SYS_print_processes 26
