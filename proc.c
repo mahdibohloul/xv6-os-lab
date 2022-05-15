@@ -87,11 +87,16 @@ allocproc(void) {
     found:
     p->state = EMBRYO;
     p->pid = nextpid++;
-    p->arrival_time = ticks;
-
+    p->creation_time = ticks;
+    p->waiting_in_queue_cycle = 0;
+    if(p->pid == 1 || p->pid == 2)
+        p->queue_lvl = ROUND_ROBIN_LVL;
+    else
+    	p->queue_lvl = FCFS_LVL;
+    p->exec_cycle = 0;	
     release(&ptable.lock);
 
-    // Allocate kernel stack.
+    // Allocyate kernel stack.
     if ((p->kstack = kalloc()) == 0) {
         p->state = UNUSED;
         return 0;
@@ -172,6 +177,14 @@ growproc(int n) {
     return 0;
 }
 
+void
+changeq(int pid, int queue){
+  struct proc* p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+            if (p->pid == pid)
+            	p->queue_lvl = queue;
+    }
+}
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
@@ -310,6 +323,7 @@ void
 printp(void){
   cprintf("name   pid   status   queue   init time   effectiveness   rank   cpu cycles\n");
   struct proc* p;
+  acquire(&ptable.lock);
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
   	if (p->pid == 0)
                 continue;
@@ -328,11 +342,12 @@ printp(void){
        else if(p -> state == ZOMBIE)
           cprintf("ZOMBIE  ");
        cprintf("%d  ", p -> queue_lvl);
-       cprintf("%d  ", p -> arrival_time);
+       cprintf("%d  ", p -> creation_time);
        cprintf("%d  ", 0);
        cprintf("%d  ", 0);
-       cprintf("%d  \n", 0);
+       cprintf("%d  \n", p -> exec_cycle);
    }
+   release(&ptable.lock);
 }
 
 //PAGEBREAK: 42
@@ -404,10 +419,15 @@ scheduler(void) {
     c->proc = p;
     switchuvm(p);
     p->state = RUNNING;
-
+    p->waiting_in_queue_cycle = 0;
+    struct proc* pc;
+    for (pc = ptable.proc; pc < &ptable.proc[NPROC]; pc++) {
+  	if (pc->pid == p->pid)
+                continue;
+        pc->waiting_in_queue_cycle++;
+    }
     swtch(&(c->scheduler), p->context);
     switchkvm();
-
     c->proc = 0;
     release(&ptable.lock);
 
@@ -444,6 +464,7 @@ void
 yield(void) {
     acquire(&ptable.lock);  //DOC: yieldlock
     myproc()->state = RUNNABLE;
+    myproc()->exec_cycle += 1;
     sched();
     release(&ptable.lock);
 }
@@ -673,16 +694,17 @@ age(void)
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
     if (p->state != RUNNABLE)
       continue;
-
+      
     if (p->waiting_in_queue_cycle > 8000) {
+
         if (p->queue_lvl == FCFS_LVL) {
             p->queue_lvl = ROUND_ROBIN_LVL;
         }
         if (p->queue_lvl == BJF_LVL) {
             p->queue_lvl = FCFS_LVL;
         }
+        p->waiting_in_queue_cycle = 0;
     }
-    p->waiting_in_queue_cycle = 0;
   }
 }
 
@@ -712,6 +734,7 @@ round_robin_sched(void)
         if (now - p -> last_cpu_time > max_process_time) {
             max_process_time = now - p -> last_cpu_time;
             chosen_proc = p;
+	    p->last_cpu_time = now;
         }
     }
     return chosen_proc;
@@ -723,9 +746,9 @@ fcfs_sched(void)
     struct proc* chosen_proc = 0;
     
     int mn = 2e9;
+
     for (struct proc* p = ptable.proc ; p < &ptable.proc[NPROC] ; p++) {
-        p -> waiting_in_queue_cycle++;
-        if (p -> state != RUNNABLE || p -> queue_lvl != FCFS_LVL) {
+        if (p -> state != RUNNABLE || p -> queue_lvl != FCFS_LVL) {  
             continue;
         }
 
@@ -735,6 +758,7 @@ fcfs_sched(void)
             chosen_proc = p;
         }
     }
+
     return chosen_proc;
 }
 

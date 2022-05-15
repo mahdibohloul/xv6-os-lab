@@ -28,6 +28,10 @@ int get_call_count(int);
 int get_most_caller(int);
 int wait_for_process(int);
 int print_processes(void);
+int change_queue(int, int);
+int set_bjf_process(int, int, int, int);
+int set_bjf(int, int, int);
+
 
 // ulib.c
 int stat(const char*, struct stat*);

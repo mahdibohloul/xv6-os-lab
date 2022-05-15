@@ -134,3 +134,25 @@ sys_print_processes(void){
   printp();
   return 0;
 }
+
+int
+sys_change_queue(void){
+  int pid;
+  int queue;
+  argint(0, &pid);
+  argint(1, &queue);
+  changeq(pid, queue);
+  return 0;
+}
+
+int
+sys_set_bjf_process(void){
+  return 0;
+}
+
+int
+sys_set_bjf(void){
+  return 0;
+}
+
+

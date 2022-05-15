@@ -127,7 +127,11 @@ int             get_next_prime_number(int);
 void            age(void);
 float           get_rank(struct proc* p);
 struct proc*    round_robin_sched(void);
+int             change_queue(int, int);
+int             set_bjf_process(int, int, int, int);
+int             set_bjf(int, int, int);
 void            printp(void);
+void            changeq(int, int);
 
 struct proc*    fcfs_sched(void);
 struct proc*    bjf_sched(void);
