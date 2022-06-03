@@ -13,6 +13,14 @@ struct
   struct proc proc[NPROC];
 } ptable;
 
+struct semaphore
+{
+  int max_procs;
+  int curr_procs;
+  struct spinlock lock;
+  struct proc* waiting_queue[NPROC];
+};
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -22,6 +30,8 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
+
+struct semaphore sem_table[SEMAPHORE_COUNT];
 
 void pinit(void)
 {
@@ -856,4 +866,83 @@ int set_bjf(int priority_ratio, int arrival_ratio, int exec_cycle_ratio)
     p->exec_cycle_ratio = exec_cycle_ratio;
   }
   return 0;
+}
+
+void
+add_to_sem_waiting_queue(int i, struct proc* p)
+{
+  for (int j = 0; j < NPROC; j++) {
+    if (sem_table[i].waiting_queue[j] == 0) {
+      sem_table[i].waiting_queue[j] = p;
+      break;
+    }
+  }
+}
+
+struct proc*
+pop_sem_from_waiting_queue(int i)
+{
+  struct proc* p = 0;
+  int j = 0;
+
+  if (sem_table[i].waiting_queue[0] == 0)
+    return 0;
+  
+  p = sem_table[i].waiting_queue[0];
+
+  for (j = 0; j < NPROC - 1; j++) {
+    if (sem_table[i].waiting_queue[j+1] != 0)
+      sem_table[i].waiting_queue[j] = sem_table[i].waiting_queue[j+1];
+    else {
+      sem_table[i].waiting_queue[j] = 0;
+      break;
+    }
+  }
+
+  return p;
+}
+
+int
+sem_init(int i, int v)
+{
+  sem_table[i].max_procs = v;
+  sem_table[i].curr_procs = 0;
+  initlock(&(sem_table[i].lock), 's' + (char*)i );
+  return 1;
+}
+
+int
+sem_acquire(int i)
+{
+  struct proc* p = myproc();
+  acquire(&(sem_table[i].lock));
+  if (sem_table[i].curr_procs < sem_table[i].max_procs) {
+    sem_table[i].curr_procs += 1;
+  }
+  else {
+    add_to_sem_waiting_queue(i, p);
+    cprintf("Process %d going to sleep\n", p->pid);
+    sleep(p, &(sem_table[i].lock));
+    cprintf("Process %d woke up\n", p->pid);
+    sem_table[i].curr_procs += 1;
+  }
+  release(&(sem_table[i].lock));
+
+  return 1;
+}
+
+int 
+sem_release(int i)
+{
+  struct proc* p = 0;
+  acquire(&(sem_table[i].lock));
+  
+  sem_table[i].curr_procs -= 1;
+  p = pop_sem_from_waiting_queue(i);
+  release(&(sem_table[i].lock));
+  if (p != 0) {
+    wakeup(p);
+  }
+
+  return 1;
 }

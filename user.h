@@ -31,6 +31,9 @@ int print_processes(void);
 int change_queue(int, int);
 int set_bjf_process(int, int, int, int);
 int set_bjf(int, int, int);
+int sem_init(int, int);
+int sem_acquire(int);
+int sem_release(int);
 
 
 // ulib.c

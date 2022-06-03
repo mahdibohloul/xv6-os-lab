@@ -124,6 +124,9 @@ extern int sys_print_processes(void);
 extern int sys_change_queue(void);
 extern int sys_set_bjf_process(void);
 extern int sys_set_bjf(void);
+extern int sys_sem_init(void);
+extern int sys_sem_acquire(void);
+extern int sys_sem_release(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -155,6 +158,9 @@ static int (*syscalls[])(void) = {
 [SYS_change_queue] sys_change_queue,
 [SYS_set_bjf_process] sys_set_bjf_process,
 [SYS_set_bjf] sys_set_bjf,
+[SYS_sem_init] sys_sem_init,
+[SYS_sem_acquire] sys_sem_acquire,
+[SYS_sem_release] sys_sem_release,
 };
 
 void

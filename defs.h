@@ -4,6 +4,7 @@ struct file;
 struct inode;
 struct pipe;
 struct proc;
+struct semaphore;
 struct rtcdate;
 struct spinlock;
 struct sleeplock;
@@ -135,6 +136,12 @@ void            changeq(int, int);
 
 struct proc*    fcfs_sched(void);
 struct proc*    bjf_sched(void);
+
+void            add_sem_to_waiting_queue(int, struct proc*);
+struct proc*    pop_sem_from_waiting_queue(int);
+int             sem_init(int, int);
+int             sem_acquire(int); 
+int             sem_release(int);            
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -154,4 +154,30 @@ sys_set_bjf(void) {
   return 0;
 }
 
+int
+sys_sem_init(void)
+{
+  int sem_id;
+  int value;
+  argint(0, &sem_id);
+  argint(1, &value);
+  return sem_init(sem_id, value);
+}
+
+int
+sys_sem_acquire(void)
+{
+  int sem_id;
+  argint(0, &sem_id);
+  return sem_acquire(sem_id);
+}
+
+int
+sys_sem_release(void)
+{
+  int sem_id;
+  argint(0, &sem_id);
+  return sem_release(sem_id);
+}
+
 

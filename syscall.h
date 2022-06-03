@@ -28,3 +28,6 @@
 #define SYS_change_queue 27
 #define SYS_set_bjf_process 28
 #define SYS_set_bjf 29
+#define SYS_sem_init 30
+#define SYS_sem_acquire 31
+#define SYS_sem_release 32

@@ -191,9 +191,11 @@ UPROGS=\
 	_sb\
 	_sbp\
 	_qc\
+	_producer_consumer_test\
 	# _get_most_caller\
 	# _call_count_test\
 	# _most_caller_test\
+	
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
