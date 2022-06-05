@@ -127,6 +127,9 @@ extern int sys_set_bjf(void);
 extern int sys_sem_init(void);
 extern int sys_sem_acquire(void);
 extern int sys_sem_release(void);
+extern int sys_reentrant_mutex_init(void);
+extern int sys_reentrant_mutex_acquire(void);
+extern int sys_reentrant_mutex_release(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -161,6 +164,9 @@ static int (*syscalls[])(void) = {
 [SYS_sem_init] sys_sem_init,
 [SYS_sem_acquire] sys_sem_acquire,
 [SYS_sem_release] sys_sem_release,
+[SYS_reentrant_mutex_init] sys_reentrant_mutex_init,
+[SYS_reentrant_mutex_acquire] sys_reentrant_mutex_acquire,
+[SYS_reentrant_mutex_release] sys_reentrant_mutex_release,
 };
 
 void
