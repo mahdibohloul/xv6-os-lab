@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "stddef.h"
 
 struct
 {
@@ -23,11 +24,9 @@ struct semaphore
 
 struct mutex
 {
+  struct proc* owner;
   struct spinlock lock;
-  int owner_pid;
-  int count;
 };
-
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -39,7 +38,7 @@ extern void trapret(void);
 static void wakeup1(void *chan);
 
 struct semaphore sem_table[SEMAPHORE_COUNT];
-struct mutex mutex_table[MUTEX_COUNT];
+struct mutex m;
 
 void pinit(void)
 {
@@ -929,9 +928,7 @@ sem_acquire(int i)
   }
   else {
     add_to_sem_waiting_queue(i, p);
-    cprintf("Process %d going to sleep\n", p->pid);
     sleep(p, &(sem_table[i].lock));
-    cprintf("Process %d woke up\n", p->pid);
     sem_table[i].curr_procs += 1;
   }
   release(&(sem_table[i].lock));
@@ -956,50 +953,21 @@ sem_release(int i)
 }
 
 int
-reentrant_mutex_init(int i, int pid)
-{
-  mutex_table[i].owner_pid = pid;
-  mutex_table[i].count = 0;
-  initlock(&(mutex_table[i].lock), 'r' + (char*)i );
-  return 1;
-}
-
-int
-reentrant_mutex_acquire(int i)
+reentrant_mutex(int count)
 {
   struct proc* p = myproc();
-  cprintf("hehe\n");
-  acquire(&(mutex_table[i].lock));
-  if (mutex_table[i].owner_pid == p->pid) {
-    cprintf("yo\n");
-    mutex_table[i].count += 1;
+  if (m.owner == p) {
+    if(count == 0) {
+      release(&m.lock);
+      m.owner = NULL;
+      return count;
+    } else {
+      return count + reentrant_mutex(count-1);
+    }   
   }
   else {
-    if (mutex_table[i].owner_pid != p->pid) {
-      cprintf("kir\n");
-      sleep(p, &(mutex_table[i].lock));
-    }
-    mutex_table[i].owner_pid = p -> pid;
-    mutex_table[i].count = 1;
+    acquire(&m.lock);
+    m.owner = p;
+    return count + reentrant_mutex(count-1);
   }
-  release(&(mutex_table[i].lock));
-
-  return 1;
-}
-
-int
-reentrant_mutex_release(int i)
-{
-  struct proc* p = 0;
-  acquire(&(mutex_table[i].lock));
-  if (mutex_table[i].owner_pid == p->pid) {
-    mutex_table[i].count -= 1;
-    if (mutex_table[i].count == 0) {
-      mutex_table[i].owner_pid = 0;
-      wakeup(p);
-    }
-  }
-  release(&(mutex_table[i].lock));
-
-  return 1;
 }

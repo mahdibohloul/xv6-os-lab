@@ -143,9 +143,7 @@ struct proc*    pop_sem_from_waiting_queue(int);
 int             sem_init(int, int);
 int             sem_acquire(int); 
 int             sem_release(int);
-int             reentrant_mutex_init(int, int);
-int             reentrant_mutex_acquire(int);
-int             reentrant_mutex_release(int);           
+int             reentrant_mutex(int);         
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -40,7 +40,5 @@ SYSCALL(set_bjf)
 SYSCALL(sem_init)
 SYSCALL(sem_acquire)
 SYSCALL(sem_release)
-SYSCALL(reentrant_mutex_init)
-SYSCALL(reentrant_mutex_acquire)
-SYSCALL(reentrant_mutex_release)
+SYSCALL(reentrant_mutex)
 
