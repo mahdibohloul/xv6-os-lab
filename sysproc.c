@@ -181,28 +181,10 @@ sys_sem_release(void)
 }
 
 int
-sys_reentrant_mutex_init(void)
+sys_reentrant_mutex(void)
 {
-  int mutex_id, pid;
-  argint(0, &mutex_id);
-  argint(1, &pid);
-  return reentrant_mutex_init(mutex_id, pid);
+  int count;
+  argint(0, &count);
+  return reentrant_mutex(count);
 }
-
-int
-sys_reentrant_mutex_acquire(void)
-{
-  int mutex_id;
-  argint(0, &mutex_id);
-  return reentrant_mutex_acquire(mutex_id);
-}
-
-int
-sys_reentrant_mutex_release(void)
-{
-  int mutex_id;
-  argint(0, &mutex_id);
-  return reentrant_mutex_release(mutex_id);
-}
-
 

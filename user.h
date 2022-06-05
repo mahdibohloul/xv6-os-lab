@@ -34,9 +34,7 @@ int set_bjf(int, int, int);
 int sem_init(int, int);
 int sem_acquire(int);
 int sem_release(int);
-int reentrant_mutex_init(int, int);
-int reentrant_mutex_acquire(int);
-int reentrant_mutex_release(int);
+int reentrant_mutex(int);
 
 
 // ulib.c

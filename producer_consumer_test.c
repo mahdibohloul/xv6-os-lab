@@ -20,13 +20,16 @@ producer()
 {
   int i = 0;
   while (i++ < 10) {
+    sleep(8);
     sem_acquire(EMPTY);
     sem_acquire(MUTEX);
+    printf(1, "producer acquired the lock.\n");
 
     printf(1, "PRODUCER: wrote item %d to index %d\n", w_index, w_index % BUFF_SIZE);
 
     sem_release(MUTEX);
     sem_release(FULL);
+    printf(1, "producer released the lock.\n\n");
     w_index++;
   }
 }
@@ -37,14 +40,16 @@ consumer()
   int i = 0;
 
   while(i++ < 10) {
-    sleep(5);
+    sleep(10);
     sem_acquire(FULL);
     sem_acquire(MUTEX);
+    printf(1, "consumer acquired the lock.\n");
 
     printf(1, "CONSUMER: read item %d from index %d\n", r_index, r_index % BUFF_SIZE);
 
     sem_release(MUTEX);
     sem_release(EMPTY);
+    printf(1, "consumer released the lock.\n\n");
     r_index++;
   }
 }
