@@ -128,6 +128,8 @@ extern int sys_sem_init(void);
 extern int sys_sem_acquire(void);
 extern int sys_sem_release(void);
 extern int sys_reentrant_mutex(void);
+extern int sys_mprotect(void);
+extern int sys_munprotect(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -163,6 +165,8 @@ static int (*syscalls[])(void) = {
 [SYS_sem_acquire] sys_sem_acquire,
 [SYS_sem_release] sys_sem_release,
 [SYS_reentrant_mutex] sys_reentrant_mutex,
+[SYS_mprotect] sys_mprotect,
+[SYS_munprotect] sys_munprotect,
 };
 
 void

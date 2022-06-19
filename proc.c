@@ -758,7 +758,7 @@ void age(void)
     if (p->state != RUNNABLE)
       continue;
 
-    if (p->waiting_in_queue_cycle > 8000)
+    if (p->waiting_in_queue_cycle > 2000)
     {
 
       if (p->queue_lvl == FCFS_LVL)

@@ -30,7 +30,7 @@ OBJS = \
 
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
-TOOLPREFIX = x86_64-elf-
+#TOOLPREFIX = x86_64-elf-
 
 # Using native tools (e.g., on X86 Linux)
 #TOOLPREFIX = 
@@ -190,9 +190,10 @@ UPROGS=\
 	_ps\
 	_sb\
 	_sbp\
-	_qc\
-	_producer_consumer_test\
-	_reentrant_mutex_test\
+	_readOnlyTest\
+	_null\
+	#_producer_consumer_test\
+	#_reentrant_mutex_test\
 	# _get_most_caller\
 	# _call_count_test\
 	# _most_caller_test\

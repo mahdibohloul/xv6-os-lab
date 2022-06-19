@@ -35,6 +35,8 @@ int sem_init(int, int);
 int sem_acquire(int);
 int sem_release(int);
 int reentrant_mutex(int);
+int mprotect(void *addr, int len);
+int munprotect(void *addr, int len);
 
 
 // ulib.c

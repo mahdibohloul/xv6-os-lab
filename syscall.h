@@ -32,3 +32,5 @@
 #define SYS_sem_acquire 31
 #define SYS_sem_release 32
 #define SYS_reentrant_mutex 33
+#define SYS_mprotect        34
+#define SYS_munprotect      35

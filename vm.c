@@ -385,6 +385,68 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+int
+mprotect(void *addr, int len)
+{
+  pte_t *p;
+  struct proc *proc = myproc();
+  int i;
+
+  if(len * PGSIZE +(int)addr > proc->sz || len <= 0){
+    cprintf("Error in Length \n");
+    return -1;
+  }
+  if((int)(((int) addr) % PGSIZE ) != 0){
+    cprintf("Error in Address: %p \n", addr);
+    return -1;
+  }
+  for (i = (int) addr; i < ((len) * PGSIZE+(int) addr); i += PGSIZE){
+    p = walkpgdir(proc->pgdir,(void*) i, 0);
+
+    if((((*p & PTE_P) != 0) != 0) && ((*p & PTE_U) && p))
+    {
+      *p = (*p) & (~PTE_W);
+      cprintf("Page Table Entry = %p\n", p);
+    }
+    else {
+      return -1;
+    }
+
+  }
+  lcr3(V2P(proc->pgdir));
+
+  return 0;
+}
+
+int
+munprotect(void *addr, int len)
+{
+  struct proc *proc = myproc();
+  pte_t *p2;
+  int i2;
+
+  if(len * PGSIZE +(int)addr > proc->sz || len <= 0){
+    cprintf("Error in Length \n");
+    return -1;
+  }
+  if((int)(((int) addr) % PGSIZE ) != 0){
+    cprintf("Error in Address: %p \n", addr);
+    return -1;
+  }
+  for (i2 = (int) addr; i2 < ((len) * PGSIZE+(int) addr); i2 += PGSIZE){
+    p2 = walkpgdir(proc->pgdir,(void*) i2, 0);
+    if(((*p2 & PTE_P) != 0) && p2 && ((*p2 & PTE_U) != 0))
+    {
+      *p2 = (*p2) | (PTE_W);
+      cprintf("Page Table Entry = %p \n", p2);}
+    else{
+      return -1;
+    }
+  }
+  lcr3(V2P(proc->pgdir));
+  return 0;
+}
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

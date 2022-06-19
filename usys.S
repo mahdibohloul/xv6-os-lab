@@ -41,4 +41,5 @@ SYSCALL(sem_init)
 SYSCALL(sem_acquire)
 SYSCALL(sem_release)
 SYSCALL(reentrant_mutex)
-
+SYSCALL(mprotect)
+SYSCALL(munprotect)

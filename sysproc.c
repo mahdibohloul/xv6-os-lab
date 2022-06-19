@@ -187,4 +187,23 @@ sys_reentrant_mutex(void)
   argint(0, &count);
   return reentrant_mutex(count);
 }
+int
+sys_mprotect(void){
+  int x;
+  int y = 0;
+  if(argint(1, &y) < 0 || argint(0, &x) < 0)
+    return -1;
+  return mprotect((void *)x,y);
+
+}
+
+int
+sys_munprotect(void){
+  int x;
+  int y = 0;
+  if(argint(1, &y) < 0 || argint(0, &x) < 0)
+    return -1;
+  return munprotect((void *)x,y);
+
+}
 
